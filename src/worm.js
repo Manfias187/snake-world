@@ -140,8 +140,30 @@ export class Worm {
 
   keepInsideArena() {
     const padding = WORM_CONFIG.boundsPadding;
-    this.x = Phaser.Math.Clamp(this.x, padding, WORLD_WIDTH - padding);
-    this.y = Phaser.Math.Clamp(this.y, padding, WORLD_HEIGHT - padding);
+    let bounced = false;
+
+    if (this.x < padding) {
+      this.x = padding;
+      bounced = true;
+    } else if (this.x > WORLD_WIDTH - padding) {
+      this.x = WORLD_WIDTH - padding;
+      bounced = true;
+    }
+
+    if (this.y < padding) {
+      this.y = padding;
+      bounced = true;
+    } else if (this.y > WORLD_HEIGHT - padding) {
+      this.y = WORLD_HEIGHT - padding;
+      bounced = true;
+    }
+
+    if (bounced) {
+      this.angle = Phaser.Math.Angle.Between(this.x, this.y, WORLD_WIDTH / 2, WORLD_HEIGHT / 2);
+      if (this.ai) {
+        this.ai.targetAngle = this.angle;
+      }
+    }
   }
 
   recordHistory() {

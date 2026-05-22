@@ -17,7 +17,7 @@ export const WORM_CONFIG = {
   spacing: 16,
   initialSegments: 4,
   minSegments: 4,
-  minHistoryDistance: 2,
+  minHistoryDistance: 0.5,
   growthPerSegment: 10,
   boundsPadding: 34,
   bodyHitRadius: 18,

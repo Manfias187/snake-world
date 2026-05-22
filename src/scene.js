@@ -1,8 +1,6 @@
 import {
   ASSETS,
   BOT_ROSTER,
-  GAME_WIDTH,
-  GAME_HEIGHT,
   POINTER_DEAD_ZONE,
   ROUND_CONFIG,
   WORLD_WIDTH,
@@ -54,6 +52,7 @@ export class SnakeWorldScene extends Phaser.Scene {
       ? 6000
       : ROUND_CONFIG.duration;
     this.lastInputAngle = 0;
+    this.touchOrigin = null;
     this.combatCooldowns = new Map();
     this.cameras.main.setBackgroundColor("#14351f");
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -338,20 +337,24 @@ export class SnakeWorldScene extends Phaser.Scene {
 
     if (xAxis !== 0 || yAxis !== 0) {
       this.lastInputAngle = Math.atan2(yAxis, xAxis);
+      this.touchOrigin = null;
       return this.lastInputAngle;
     }
 
     const pointer = this.input.activePointer;
     if (pointer.isDown) {
-      const dx = pointer.x - GAME_WIDTH / 2;
-      const dy = pointer.y - GAME_HEIGHT / 2;
+      if (!this.touchOrigin) {
+        this.touchOrigin = { x: pointer.x, y: pointer.y };
+      }
+      const dx = pointer.x - this.touchOrigin.x;
+      const dy = pointer.y - this.touchOrigin.y;
       if (dx * dx + dy * dy > POINTER_DEAD_ZONE * POINTER_DEAD_ZONE) {
         this.lastInputAngle = Math.atan2(dy, dx);
-        return this.lastInputAngle;
       }
       return this.lastInputAngle;
     }
 
+    this.touchOrigin = null;
     return this.playerWorm.angle;
   }
 

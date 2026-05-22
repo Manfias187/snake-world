@@ -1,7 +1,8 @@
 import {
   AI_CONFIG,
   WORLD_WIDTH,
-  WORLD_HEIGHT
+  WORLD_HEIGHT,
+  WORM_CONFIG
 } from "./config.js";
 
 export function getAiTargetAngle(scene, worm, time) {
@@ -29,6 +30,13 @@ export function getAiTargetAngle(scene, worm, time) {
   if (threat) {
     worm.ai.state = "FLEE";
     worm.ai.targetAngle = Phaser.Math.Angle.Between(threat.x, threat.y, worm.x, worm.y);
+    return worm.ai.targetAngle;
+  }
+
+  const huntTarget = findHuntTarget(scene, worm);
+  if (huntTarget) {
+    worm.ai.state = "HUNT";
+    worm.ai.targetAngle = Phaser.Math.Angle.Between(worm.x, worm.y, huntTarget.x, huntTarget.y);
     return worm.ai.targetAngle;
   }
 
@@ -97,16 +105,41 @@ function findThreateningHead(scene, worm) {
       return;
     }
 
-    const distance = Phaser.Math.Distance.Between(worm.x, worm.y, other.x, other.y);
-    const isThreat = other.segmentCount >= worm.segmentCount + 2 || other.isPlayer;
+    if (other.segmentCount < worm.segmentCount * WORM_CONFIG.untouchableRatio) {
+      return;
+    }
 
-    if (isThreat && distance < AI_CONFIG.dangerDistance && distance < nearestDistance) {
+    const distance = Phaser.Math.Distance.Between(worm.x, worm.y, other.x, other.y);
+    if (distance < AI_CONFIG.dangerDistance && distance < nearestDistance) {
       nearest = other;
       nearestDistance = distance;
     }
   });
 
   return nearest;
+}
+
+function findHuntTarget(scene, worm) {
+  let best = null;
+  let bestDistance = Infinity;
+
+  scene.worms.forEach((victim) => {
+    if (victim === worm || !victim.alive || victim.isInvulnerable) {
+      return;
+    }
+
+    if (worm.segmentCount < victim.segmentCount * WORM_CONFIG.untouchableRatio) {
+      return;
+    }
+
+    const distance = Phaser.Math.Distance.Between(worm.x, worm.y, victim.x, victim.y);
+    if (distance < AI_CONFIG.attackVision && distance < bestDistance) {
+      best = victim;
+      bestDistance = distance;
+    }
+  });
+
+  return best;
 }
 
 function findBiteTarget(scene, worm) {
@@ -118,8 +151,11 @@ function findBiteTarget(scene, worm) {
       return;
     }
 
-    const startIndex = Math.max(2, Math.floor(victim.segmentSprites.length * 0.45));
-    for (let index = startIndex; index < victim.segmentSprites.length; index += 2) {
+    if (victim.segmentCount >= worm.segmentCount * WORM_CONFIG.untouchableRatio) {
+      return;
+    }
+
+    for (let index = 2; index < victim.segmentSprites.length; index += 1) {
       const segment = victim.segmentSprites[index];
       const distance = Phaser.Math.Distance.Between(worm.x, worm.y, segment.x, segment.y);
 

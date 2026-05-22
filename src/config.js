@@ -51,10 +51,10 @@ export const ROUND_CONFIG = {
 };
 
 export const AI_CONFIG = {
-  thinkDelay: [230, 520],
+  thinkDelay: [150, 350],
   foodVision: 620,
-  attackVision: 480,
-  dangerDistance: 190,
+  attackVision: 720,
+  dangerDistance: 130,
   edgeDistance: 155,
   obstacleDistance: 86,
   wanderTurn: 0.78

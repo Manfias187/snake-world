@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Snake World</title>
     <link rel="icon" href="data:," />
     <style>
@@ -13,6 +16,9 @@
 
       * {
         box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        user-select: none;
       }
 
       html,
@@ -29,6 +35,11 @@
         background: #11160f;
         color: #ecffd5;
         font-family: "Courier New", monospace;
+        min-height: 100dvh;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
       }
 
       #game {
@@ -37,6 +48,27 @@
         aspect-ratio: 3 / 2;
         background: #1f4f31;
         box-shadow: 0 0 0 2px #2b4a2f, 0 18px 70px rgba(0, 0, 0, 0.55);
+      }
+
+      @media (pointer: coarse) {
+        body {
+          padding: 0;
+        }
+        #game {
+          width: 100vw;
+          height: 100dvh;
+          max-width: none;
+          aspect-ratio: auto;
+          box-shadow: none;
+        }
+      }
+
+      #game:fullscreen {
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        aspect-ratio: auto;
+        box-shadow: none;
       }
 
       canvas {

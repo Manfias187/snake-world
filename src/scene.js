@@ -137,6 +137,7 @@ export class SnakeWorldScene extends Phaser.Scene {
     });
 
     this.input.on("pointerdown", () => {
+      this.tryMobileFullscreen();
       if (this.state === "ready") {
         this.startRound();
       } else if (this.state === "paused") {
@@ -145,6 +146,20 @@ export class SnakeWorldScene extends Phaser.Scene {
         this.scene.restart();
       }
     });
+  }
+
+  tryMobileFullscreen() {
+    if (!window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+    if (this.scale.isFullscreen) {
+      return;
+    }
+    try {
+      this.scale.startFullscreen();
+    } catch (err) {
+      // browser may deny fullscreen outside a direct user gesture; ignore
+    }
   }
 
   buildWorms() {
